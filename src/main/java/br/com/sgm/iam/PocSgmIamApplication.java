@@ -10,5 +10,4 @@ public class PocSgmIamApplication {
 		SpringApplication.run(PocSgmIamApplication.class, args);
 	}
 
-
 }
