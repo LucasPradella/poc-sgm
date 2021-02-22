@@ -58,13 +58,15 @@ public class JwtTokenUtil implements Serializable {
     //Cria o token e devine tempo de expiração pra ele
     private String doGenerateToken(Map<String, Object> claims, String subject) {
 
-        claims.put("scopes", Arrays.asList("ROLE_ADMIN"));
+        claims.put("authorities", Arrays.asList("ROLE_ADMIN, ROLE_PERSON")); // TODO:: adicionar regras banco de dados
+        claims.put("scope", Arrays.asList("read", "write"));
+
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(subject)
+                .setSubject(subject) // TODO :: quem gerou o token
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000)) //TODO :: Adicionar o tempo de expiração em variavel de ambiente
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
     }
