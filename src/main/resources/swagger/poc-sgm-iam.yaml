@@ -103,7 +103,7 @@ definitions:
       id:
         type: "integer"
         format: "int64"
-      username:
+      userName:
         type: "string"
       firstName:
         type: "string"
@@ -123,7 +123,7 @@ definitions:
   Login:
     type: "object"
     properties:
-      username:
+      userName:
         type: "string"
       password:
         type: "string"

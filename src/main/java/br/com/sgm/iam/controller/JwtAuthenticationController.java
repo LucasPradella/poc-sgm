@@ -40,12 +40,12 @@ public class JwtAuthenticationController implements SgmIamApi {
     public ResponseEntity<LoginResponse> authenticate(Login authenticationRequest) {
 
         try {
-            auth(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+            auth(authenticationRequest.getUserName(), authenticationRequest.getPassword());
         } catch (Exception e){
             ResponseEntity.status(UNAUTHORIZED).build();
         }
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUserName());
         final String token = jwtTokenUtil.generateToken(userDetails);
 
         LoginResponse response = new LoginResponse();
