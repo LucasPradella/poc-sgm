@@ -12,7 +12,7 @@
 	<artifactId>poc-sgm-iam</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>poc-sgm-iam</name>
-	<description> Client identity and access</description>
+	<description>Client identity and access</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>
@@ -38,13 +38,22 @@
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
+			<version>0.9.1</version>
 		</dependency>
-
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-annotations</artifactId>
+			<version>1.6.2</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>2.0.1.Final</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -61,7 +70,49 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>io.swagger</groupId>
+				<artifactId>swagger-codegen-maven-plugin</artifactId>
+				<version>2.4.18</version>
+				<executions>
+					<execution>
+						<id>iam</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>src/main/resources/swagger/poc-sgm-iam.yaml</inputSpec>
+							<language>spring</language>
+							<modelPackage>br.com.sgm.iam.model</modelPackage>
+							<apiPackage>br.com.sgm.iam.api</apiPackage>
+							<generateSupportingFiles>false</generateSupportingFiles>
+							<configOptions>
+								<souceFolder>gen</souceFolder>
+								<interfaceOnly>true</interfaceOnly>
+								<dataLibrary>java8</dataLibrary>
+							</configOptions>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>target/generated/swagger/gen</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-
 </project>

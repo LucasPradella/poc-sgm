@@ -1,18 +1,21 @@
 package br.com.sgm.iam.config;
 
-import java.io.Serializable;
+import br.com.sgm.iam.model.MockerUser;
+import br.com.sgm.iam.model.UserModel;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtTokenUtil implements Serializable {
@@ -21,6 +24,9 @@ public class JwtTokenUtil implements Serializable {
 
     @Value("${jwt.secret}")
     private String secret;
+
+    @Autowired
+    private MockerUser mockerUser;
 
     //retorna o username do token jwt
     public String getUsernameFromToken(String token) {
@@ -52,19 +58,24 @@ public class JwtTokenUtil implements Serializable {
     //gera token para user
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, userDetails.getUsername());
+        return doGenerateToken(claims, userDetails);
     }
 
     //Cria o token e devine tempo de expiração pra ele
-    private String doGenerateToken(Map<String, Object> claims, String subject) {
+    private String doGenerateToken(Map<String, Object> claims, UserDetails user) {
 
-        claims.put("scopes", Arrays.asList("ROLE_ADMIN"));
+        UserModel userMock = mockerUser.process(user.getUsername());
+
+        claims.put("authorities", userMock.getProfiles());
+        claims.put("scope", Arrays.asList("read", "write"));
+
+        System.out.println(user.getAuthorities());
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(subject)
+                .setSubject(user.getUsername()) // TODO :: quem gerou o token
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000)) //TODO :: Adicionar o tempo de expiração em variavel de ambiente
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
     }
